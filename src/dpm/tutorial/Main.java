@@ -22,7 +22,7 @@ public class Main {
 	// Constants
 	public static final double WHEEL_RADIUS = 2.130;
 	public static final double TRACK = 15;
-	private static Navigation nav;
+	private static Navigator nav;
 	private static Odometer odometer;
 	
 	public static void main(String[] args) throws FileNotFoundException {
@@ -30,7 +30,7 @@ public class Main {
 		Log.setLogging(true,true,false,true);
 		
 		//Uncomment this line to print to a file
-		Log.setLogWriter(System.currentTimeMillis() + ".log");
+//		Log.setLogWriter(System.currentTimeMillis() + ".log");
 		
 		// some objects that need to be instantiated	
 		odometer = new Odometer(leftMotor, rightMotor);
@@ -38,29 +38,30 @@ public class Main {
 		UltrasonicPoller usPoller = new UltrasonicPoller(usSensor);
 		usPoller.start();
 		
-		nav = new Navigation(odometer,usPoller);
+		nav = new Navigator(odometer,usPoller);
 		nav.start();
 		
-		try {
-			completeCourse();
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
+		
+		completeCourse();
+		
 		
 	
 		while (Button.waitForAnyPress() != Button.ID_ESCAPE);
 		System.exit(0);
 	}
 
-	private static void completeCourse() throws Exception {
+	private static void completeCourse() {
 		
 		int[][] waypoints = {{60,30},{30,30},{30,60},{60,0}};
 		
 		for(int[] point : waypoints){
-			nav.travelTo(point[0],point[1],true);
+			nav.travelTo(point[0],point[1],false);
 			while(nav.isTravelling()){
-				Thread.sleep(500);
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}

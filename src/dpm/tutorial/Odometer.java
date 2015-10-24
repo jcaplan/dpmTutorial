@@ -7,6 +7,8 @@ package dpm.tutorial;
  * Fall 2011
  * Ported to EV3 by: Francois Ouellet Delorme
  * Fall 2015
+ * Changed to Thread - Jonah Caplan
+ * 2015
  * 
  * Class which controls the odometer for the robot
  * 
