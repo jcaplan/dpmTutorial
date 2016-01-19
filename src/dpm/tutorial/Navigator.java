@@ -1,6 +1,5 @@
 package dpm.tutorial;
 
-
 /*
  * 
  * The Navigator class extends the functionality of the Navigation class.
@@ -19,20 +18,13 @@ package dpm.tutorial;
  * 
  */
 
-
 public class Navigator extends BasicNavigator {
 
-	enum State {
-		INIT, TURNING, TRAVELLING, EMERGENCY
-	};
-
-	State state;
 
 	private boolean isNavigating = false;
 
 	private double destx, desty;
 
-	final static int SLEEP_TIME = 50;
 
 	UltrasonicPoller usSensor;
 
@@ -52,12 +44,24 @@ public class Navigator extends BasicNavigator {
 	 * 
 	 */
 	public void travelTo(double x, double y, boolean avoid) {
+		
 		if (avoid) {
+
 			destx = x;
 			desty = y;
 			isNavigating = true;
+			Thread thread = new Thread(new NavRunnable(x,y,this));
+			thread.start();
+			try {
+				thread.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			isNavigating = false;
 		} else {
+			isNavigating = true;
 			super.travelTo(x, y);
+			isNavigating = false;
 		}
 	}
 
@@ -65,7 +69,7 @@ public class Navigator extends BasicNavigator {
 	/*
 	 * Updates the h
 	 */
-	private void updateTravel() {
+	void updateTravel() {
 		double minAng;
 
 		minAng = getDestAngle(destx, desty);
@@ -78,70 +82,12 @@ public class Navigator extends BasicNavigator {
 		this.setSpeeds(FAST, FAST);
 	}
 
-	public void run() {
-		ObstacleAvoidance avoidance = null;
-		state = State.INIT;
-		while (true) {
-			switch (state) {
-			case INIT:
-				if (isNavigating) {
-					state = State.TURNING;
-				}
-				break;
-			case TURNING:
-				/*
-				 * Note: you could probably use the original turnTo()
-				 * from BasicNavigator here without doing any damage.
-				 * It's cheating the idea of "regular and periodic" a bit
-				 * but if you're sure you never need to interrupt a turn there's
-				 * no harm.
-				 * 
-				 * However, this implementation would be necessary if you would like
-				 * to stop a turn in the middle (e.g. if you were travelling but also
-				 * scanning with a sensor for something...)
-				 * 
-				 */
-				double destAngle = getDestAngle(destx, desty);
-				turnTo(destAngle);
-				if(facingDest(destAngle)){
-					setSpeeds(0,0);
-					state = State.TRAVELLING;
-				}
-				break;
-			case TRAVELLING:
-				if (checkEmergency()) { // order matters!
-					state = State.EMERGENCY;
-					avoidance = new ObstacleAvoidance(this);
-					avoidance.start();
-				} else if (!checkIfDone(destx, desty)) {
-					updateTravel();
-				} else { // Arrived!
-					setSpeeds(0, 0);
-					isNavigating = false;
-					state = State.INIT;
-				}
-				break;
-			case EMERGENCY:
-				if (avoidance.resolved()) {
-					state = State.TURNING;
-				}
-				break;
-			}
-			Log.log(Log.Sender.Navigator, "state: " + state);
-			try {
-				Thread.sleep(SLEEP_TIME);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+	private void log(String message) {
+		Log.log(Navigator.class, message);
+		
 	}
 
-	private boolean checkEmergency() {
-		return usSensor.getDistance() < 10;
-	}
-
-
-	private void turnTo(double angle) {
+	void turnTo(double angle) {
 		double error;
 		error = angle - this.odometer.getAng();
 
@@ -172,6 +118,14 @@ public class Navigator extends BasicNavigator {
 
 	public boolean isTravelling() {
 		return isNavigating;
+	}
+
+	public UltrasonicPoller getUsSensor() {
+		return usSensor;
+	}
+
+	public Odometer getOdometer() {
+		return odometer;
 	}
 
 }

@@ -13,7 +13,7 @@ package dpm.tutorial;
  */
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
-public class BasicNavigator extends Thread{
+public class BasicNavigator {
 	
 	final static int FAST = 200, SLOW = 100, ACCELERATION = 4000;
 	final static double DEG_ERR = 3.0, CM_ERR = 1.0;

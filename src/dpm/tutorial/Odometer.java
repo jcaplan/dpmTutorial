@@ -100,7 +100,7 @@ public class Odometer extends Thread {
 				e.printStackTrace();
 			}
 
-			Log.log(Log.Sender.odometer,String.format("x: %f, y: %f, a: %f",
+			Log.log(Odometer.class,String.format("x: %f, y: %f, a: %f",
 						getX(), getY(), getAng()));
 			
 		}
@@ -182,5 +182,9 @@ public class Odometer extends Thread {
 			return d;
 		else
 			return d - 360.0;
+	}
+	
+	public String getPositionString() {
+		return String.format("[%f,%f,%f]",x,y,theta);
 	}
 }

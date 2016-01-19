@@ -31,7 +31,7 @@ public class UltrasonicPoller extends Thread {
 			distance = (int) (usData[0] * 100.0); // extract from buffer, cast
 													// to int
 
-			Log.log(Log.Sender.usSensor, Integer.toString(distance));
+			Log.log(UltrasonicPoller.class, Integer.toString(distance));
 
 			try {
 				Thread.sleep(50);

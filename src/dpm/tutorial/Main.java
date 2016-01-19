@@ -27,9 +27,11 @@ public class Main {
 	
 	public static void main(String[] args) throws FileNotFoundException {
 	
-		Log.setLogging(true,true,false,true);
-		
-		//Uncomment this line to print to a file
+		Log.addClass(Navigator.class, "NAV");
+		Log.addClass(NavRunnable.class,"NAVR");
+//		Log.addClass(ObstacleAvoidance.class, "OA");
+//		Log.addClass(Odometer.class, "ODO");
+//		Log.addClass(UltrasonicPoller.class, "US");
 //		Log.setLogWriter(System.currentTimeMillis() + ".log");
 		
 		// some objects that need to be instantiated	
@@ -39,14 +41,10 @@ public class Main {
 		usPoller.start();
 		
 		nav = new Navigator(odometer,usPoller);
-		nav.start();
 		
 		
 		completeCourse();
 		
-		
-	
-		while (Button.waitForAnyPress() != Button.ID_ESCAPE);
 		System.exit(0);
 	}
 
@@ -55,14 +53,7 @@ public class Main {
 		int[][] waypoints = {{60,30},{30,30},{30,60},{60,0}};
 		
 		for(int[] point : waypoints){
-			nav.travelTo(point[0],point[1],false);
-			while(nav.isTravelling()){
-				try {
-					Thread.sleep(500);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
+			nav.travelTo(point[0],point[1],true);
 		}
 	}
 	

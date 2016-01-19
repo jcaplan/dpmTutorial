@@ -29,17 +29,22 @@ public class ObstacleAvoidance extends Thread{
 		 * new states will be necessary.
 		 * 
 		 */
+		log("avoiding obstacle!");
 		
-		Log.log(Log.Sender.avoidance,"avoiding obstacle!");
 		nav.setSpeeds(0, 0);
 		nav.turnTo(0,true);
 		nav.goForward(5, false); //using false means the Navigation method is used
-		Log.log(Log.Sender.avoidance,"obstacle avoided!");
+		log("obstacle avoided!");
 		safe = true;
 	}
 
 
 	public boolean resolved() {
 		return safe;
+	}
+	
+	private void log(String message){
+		Log.log(ObstacleAvoidance.class,message);
+		
 	}
 }
